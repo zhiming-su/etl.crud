@@ -17,17 +17,19 @@ import org.springframework.stereotype.Component;
 
 import com.xiyu.schedulix.api.util.GetRunTime;
 import com.xiyu.schedulix.api.util.SchedulixCMD;
-import com.xiyu.schedulix.dao.Job;
+import com.xiyu.schedulix.controller.SchedulixJobController;
+import com.xiyu.schedulix.model.Job;
 
 @Component
-public class receiveTest {
+public class receiveMq {
 
 	// private producerTest pt=new producerTest();
 	Logger logger = LoggerFactory.getLogger(getClass());
 	@Autowired
 	// private JmsTemplate jmsTemplate;
 	private JmsMessagingTemplate jmsMessagingTemplate;
-
+	@Autowired
+    private SchedulixJobController sjc;
 	public Map<String, String> jobID = new HashMap<String, String>();
 	public Map<String, Long> wenjianTime = new HashMap<String, Long>();
 
@@ -38,6 +40,7 @@ public class receiveTest {
 		String wenjianId = textMsg.getText().replaceAll("\"", "");
 		// logger.info("receive:" + textMsg.getText());
 		message.acknowledge();
+		//sjc.addNewJOB(wenjianId, "2222", "200");
 		while (true) {
 			if (jobID.size() == 2) {
 				logger.info("Warning:" + "Reach the current maximum number of jobs, waiting for 5s!!");
@@ -70,28 +73,32 @@ public class receiveTest {
 			String val = (String) item.getValue();
 			String flag = SchedulixCMD.etlConvertResult(val);
 			if (flag.equals("success")) {
-				send("wenjian_id_status", new Job(key, "200"));
-				logger.info("producer:" + " wenjianId: " + key + " jobID: " + val + " statusID: " + "200");
+				//send("wenjian_id_status", new Job(key, "200"));
+				sjc.addNewJOB(key, val, "200");
+				logger.info("INSERT DB:" + " wenjianId: " + key + " jobID: " + val + " statusID: " + "200");
 				jobInfo.remove();
 			} else if (flag.equals("error")) {
 				// job.setMsg("失败");
-				send("wenjian_id_status", new Job(key, "500"));
-				logger.info("producer:" + " wenjianId: " + key + " jobID: " + val + " statusID: " + "500");
+				//send("wenjian_id_status", new Job(key, "500"));
+				sjc.addNewJOB(key, val, "500");
+				logger.info("INSERT DB:" + " wenjianId: " + key + " jobID: " + val + " statusID: " + "500");
 				jobInfo.remove();
 			} else if (flag.equals("cancelled")) {
 				// job.setMsg("作业已经取消");
-				send("wenjian_id_status", new Job(key, "301"));
-				logger.info("producer:" + " wenjianId: " + key + " jobID: " + val + " statusID: " + "301");
+				//send("wenjian_id_status", new Job(key, "301"));
+				sjc.addNewJOB(key, val, "301");
+				logger.info("INSERT DB:" + " wenjianId: " + key + " jobID: " + val + " statusID: " + "301");
 				jobInfo.remove();
 			} else if (flag.equals("keyNotFound")) {
 				// job.setMsg("作业ID不存在");
-				send("wenjian_id_status", new Job(key, "302"));
-				logger.info("producer:" + " wenjianId: " + key + " jobID: " + val + " statusID: " + "302");
+				//send("wenjian_id_status", new Job(key, "302"));
+				sjc.addNewJOB(key, val, "302");
+				logger.info("INSERT DB:" + " wenjianId: " + key + " jobID: " + val + " statusID: " + "302");
 				jobInfo.remove();
 			} else {
 				// job.setMsg("正在执行");
 				// jmsTemplate.convertAndSend("wenjian_id_status", new Job(key, "300"));
-				logger.info("producer:" + " wenjianId: " + key + " jobID: " + val + " statusID: " + "300");
+				logger.info("INFO(not insert db):" + " wenjianId: " + key + " jobID: " + val + " statusID: " + "300");
 			}
 		}
 		// System.out.println("----------"+jobID.size());
@@ -105,8 +112,9 @@ public class receiveTest {
 			long val = item.getValue();
 			long runingTime = Calendar.getInstance().getTimeInMillis() - val;
 			String dbTime = GetRunTime.formatTime(runingTime);
-			if (Double.parseDouble(dbTime) >= 30) {
+			if (Double.parseDouble(dbTime) >= 25) {
 				if(SchedulixCMD.killEtlJob(key) && SchedulixCMD.cancelErrorJob(key)) {
+					logger.info("JOBID: "+key+" INFO: TIMEOUT TO KILL");
 					jobInfo.remove();
 				}
 				

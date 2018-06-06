@@ -11,8 +11,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jms.core.JmsTemplate;
 //import org.springframework.scheduling.annotation.Scheduled;
 import com.xiyu.schedulix.api.util.SchedulixCMD;
-import com.xiyu.schedulix.dao.Job;
-import com.xiyu.schedulix.receive.receiveTest;
+import com.xiyu.schedulix.model.Job;
+import com.xiyu.schedulix.receive.receiveMq;
 
   
 
@@ -24,7 +24,7 @@ public class producerTest {
      Logger logger = LoggerFactory.getLogger(getClass());
    // @Autowired
     //private Queue queue;
-    private  Map<String, String> jobID=new receiveTest().jobID;
+    private  Map<String, String> jobID=new receiveMq().jobID;
     @Autowired
     // private JmsMessagingTemplate jmsMessagingTemplate;
      private  JmsTemplate jmsTemplate;

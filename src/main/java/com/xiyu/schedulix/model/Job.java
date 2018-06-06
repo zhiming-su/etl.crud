@@ -1,4 +1,4 @@
-package com.xiyu.schedulix.dao;
+package com.xiyu.schedulix.model;
 
 
 public class Job {
