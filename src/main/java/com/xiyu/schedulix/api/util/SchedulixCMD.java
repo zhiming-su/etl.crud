@@ -1,4 +1,4 @@
-package com.xiyu.schedulx.api.util;
+package com.xiyu.schedulix.api.util;
 
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
@@ -6,7 +6,6 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-
 
 public class SchedulixCMD {
 	// 调用schedulix命令
@@ -16,7 +15,7 @@ public class SchedulixCMD {
 		// documentId;
 		// String command = "/home/ubuntu/schedulix/sdmsh_file_01/caiwu_wenben_1.sh " +
 		// documentId;
-		System.out.println("command:" + command);
+		// System.out.println("command:" + command);
 		String line = null;
 		StringBuilder sb = new StringBuilder();
 		Runtime runtime = Runtime.getRuntime();
@@ -31,7 +30,7 @@ public class SchedulixCMD {
 			e.printStackTrace();
 		}
 		String result = sb.toString();
-		//System.out.println("etlConvert-return:" + result);
+		// System.out.println("etlConvert-return:" + result);
 		String id = "";
 		Pattern pattern = Pattern.compile("ID : (\\d*)\\n");
 		Matcher matcher = pattern.matcher(result);
@@ -70,7 +69,7 @@ public class SchedulixCMD {
 			e.printStackTrace();
 		}
 		String result = sb.toString();
-		//System.out.println("etlConvertResult-return:" + result);
+		// System.out.println("etlConvertResult-return:" + result);
 
 		String regex = "\n(" + id + ".*)\n";
 		Pattern pattern = Pattern.compile(regex);
@@ -98,5 +97,85 @@ public class SchedulixCMD {
 			flag = "cancelled";
 		}
 		return flag;
+	}
+
+	/**
+	 * kill etl job
+	 */
+	public static boolean killEtlJob(String id) {
+		String command = "echo \"alter job " + id + "with kill ;\"|sdmsh";
+		// String command = "sh /home/ubuntu/schedulix/sdmsh_file/caiwu_wenben_2.sh " +
+		// id;
+		// String command = "sh /home/ubuntu/schedulix/sdmsh_file_01/caiwu_wenben_2.sh "
+		// + id;
+		// System.out.println("command:" + command);
+		String line = null;
+		StringBuilder sb = new StringBuilder();
+		Runtime runtime = Runtime.getRuntime();
+		try {
+			Process process = runtime.exec(new String[] { "/bin/sh", "-c", command });
+			process.waitFor();
+			BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(process.getInputStream()));
+			while ((line = bufferedReader.readLine()) != null) {
+				// if(i==12) {
+				sb.append(line + "\n");
+				// }
+				// i++;
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		String result = sb.toString();
+		// System.out.println("etlConvertResult-return:" + result);
+
+		String regex = "Job altered";
+		Pattern pattern = Pattern.compile(regex);
+		Matcher matcher = pattern.matcher(result);
+		if (matcher.find()) {
+			return true;
+		} else {
+			return false;
+		}
+
+	}
+
+	/**
+	 * cancel error job
+	 */
+	public static boolean cancelErrorJob(String id) {
+		String command = "echo \"alter job " + id + "with cancel ;\"|sdmsh";
+		// String command = "sh /home/ubuntu/schedulix/sdmsh_file/caiwu_wenben_2.sh " +
+		// id;
+		// String command = "sh /home/ubuntu/schedulix/sdmsh_file_01/caiwu_wenben_2.sh "
+		// + id;
+		// System.out.println("command:" + command);
+		String line = null;
+		StringBuilder sb = new StringBuilder();
+		Runtime runtime = Runtime.getRuntime();
+		try {
+			Process process = runtime.exec(new String[] { "/bin/sh", "-c", command });
+			process.waitFor();
+			BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(process.getInputStream()));
+			while ((line = bufferedReader.readLine()) != null) {
+				// if(i==12) {
+				sb.append(line + "\n");
+				// }
+				// i++;
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		String result = sb.toString();
+		// System.out.println("etlConvertResult-return:" + result);
+
+		String regex = "Job altered";
+		Pattern pattern = Pattern.compile(regex);
+		Matcher matcher = pattern.matcher(result);
+		if (matcher.find()) {
+			return true;
+		} else {
+			return false;
+		}
+
 	}
 }

@@ -9,12 +9,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jms.core.JmsTemplate;
-import org.springframework.scheduling.annotation.EnableScheduling;
 //import org.springframework.scheduling.annotation.Scheduled;
-import org.springframework.stereotype.Component;
+import com.xiyu.schedulix.api.util.SchedulixCMD;
 import com.xiyu.schedulix.dao.Job;
 import com.xiyu.schedulix.receive.receiveTest;
-import com.xiyu.schedulx.api.util.SchedulixCMD;
 
   
 
