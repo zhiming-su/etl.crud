@@ -45,13 +45,13 @@ public class Application {
        return new ActiveMQQueue("wenjian_id");
 
     }
-    @Bean
-
-    public ActiveMQQueue Queue01() {
-
-       return new ActiveMQQueue("wenjian_id_status");
-
-    }
+//    @Bean
+//
+//    public ActiveMQQueue Queue01() {
+//
+//       return new ActiveMQQueue("wenjian_id_status");
+//
+//    }
     
     public static void main(String[] args) {
         // Launch the application

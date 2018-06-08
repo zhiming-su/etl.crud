@@ -11,7 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jms.core.JmsTemplate;
 //import org.springframework.scheduling.annotation.Scheduled;
 import com.xiyu.schedulix.api.util.SchedulixCMD;
-import com.xiyu.schedulix.model.Job;
+//import com.xiyu.schedulix.model.Job;
 import com.xiyu.schedulix.receive.receiveMq;
 
   
@@ -44,22 +44,22 @@ public class producerTest {
 			String val = (String) entry.getValue();
 			String flag = SchedulixCMD.etlConvertResult(val);
 			if (flag.equals("success")) {
-				jmsTemplate.convertAndSend("wenjian_id_status", new Job(key, "200"));
+				//jmsTemplate.convertAndSend("wenjian_id_status", new Job(key, "200"));
 				logger.info("发送的报文为:" +" wenjianId: "+ key + " jobID: "+val+" 状态ID: " + "200");
 				jobID.remove(key);
 			} else if (flag.equals("error")) {
 				// job.setMsg("失败");
-				jmsTemplate.convertAndSend("wenjian_id_status", new Job(key, "500"));			
+				//jmsTemplate.convertAndSend("wenjian_id_status", new Job(key, "500"));			
 				logger.info("发送的报文为:" +" wenjianId: "+ key + " jobID: "+val+" 状态ID: " + "500");
 				jobID.remove(key);
 			} else if (flag.equals("cancelled")) {
 				// job.setMsg("作业已经取消");
-				jmsTemplate.convertAndSend("wenjian_id_status", new Job(key, "301"));			
+				//jmsTemplate.convertAndSend("wenjian_id_status", new Job(key, "301"));			
 				logger.info("发送的报文为:" +" wenjianId: "+ key + " jobID: "+val+" 状态ID: " + "301");
 				jobID.remove(key);
 			} else if (flag.equals("keyNotFound")) {
 				// job.setMsg("作业ID不存在");
-				jmsTemplate.convertAndSend("wenjian_id_status", new Job(key, "302"));
+			//	jmsTemplate.convertAndSend("wenjian_id_status", new Job(key, "302"));
 				logger.info("发送的报文为:" +" wenjianId: "+ key + " jobID: "+val+" 状态ID: " + "302");
 				jobID.remove(key);
 			} else {

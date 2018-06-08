@@ -12,22 +12,20 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jms.annotation.JmsListener;
-import org.springframework.jms.core.JmsMessagingTemplate;
 import org.springframework.stereotype.Component;
-
 import com.xiyu.schedulix.api.util.GetRunTime;
 import com.xiyu.schedulix.api.util.SchedulixCMD;
 import com.xiyu.schedulix.controller.SchedulixJobController;
-import com.xiyu.schedulix.model.Job;
+import com.xiyu.schedulix.model.WenJian;
 
 @Component
 public class receiveMq {
 
 	// private producerTest pt=new producerTest();
 	Logger logger = LoggerFactory.getLogger(getClass());
-	@Autowired
+	//@Autowired
 	// private JmsTemplate jmsTemplate;
-	private JmsMessagingTemplate jmsMessagingTemplate;
+	//private JmsMessagingTemplate jmsMessagingTemplate;
 	@Autowired
     private SchedulixJobController sjc;
 	public Map<String, String> jobID = new HashMap<String, String>();
@@ -37,9 +35,14 @@ public class receiveMq {
 	@JmsListener(destination = "wenjian_id")
 	public void receiveQueue(Message message) throws InterruptedException, JMSException {
 		TextMessage textMsg = (TextMessage) message;
-		String wenjianId = textMsg.getText().replaceAll("\"", "");
+		//System.out.println(textMsg.getText());
+		String wenjianInfo = textMsg.getText().replaceAll("\"|\\}|\\{", "");
+		String wenjianId = wenjianInfo.split(",")[1].split(":")[1];
+		String jobPath = wenjianInfo.split(",")[0].split(":")[1];
+	//	WenJian wj = textMsg.getText();
 		// logger.info("receive:" + textMsg.getText());
 		message.acknowledge();
+		//Thread.sleep(60000);
 		//sjc.addNewJOB(wenjianId, "2222", "200");
 		while (true) {
 			if (jobID.size() == 2) {
@@ -54,16 +57,12 @@ public class receiveMq {
 		}
 		logger.info("submit wenjian id :" + textMsg.getText());
 		// send("wenjian_id_status", new Job(wenjianId, "200"));
-		String schedulixJobID = SchedulixCMD.etlConvert("SYSTEM.TEST", wenjianId);
+		String schedulixJobID = SchedulixCMD.etlConvert(jobPath, wenjianId);
 		jobID.put(wenjianId, schedulixJobID);
 		wenjianTime.put(schedulixJobID, Calendar.getInstance().getTimeInMillis());
 
 	}
 
-	public void send(String str, Job job) {
-		logger.info("send !!!");
-		jmsMessagingTemplate.convertAndSend(str, job);
-	}
 
 	// @SuppressWarnings("rawtypes")
 	public void checkJobStatus() {
