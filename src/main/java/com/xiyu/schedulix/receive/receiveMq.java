@@ -16,7 +16,7 @@ import org.springframework.stereotype.Component;
 import com.xiyu.schedulix.api.util.GetRunTime;
 import com.xiyu.schedulix.api.util.SchedulixCMD;
 import com.xiyu.schedulix.controller.SchedulixJobController;
-import com.xiyu.schedulix.model.WenJian;
+//import com.xiyu.schedulix.model.WenJian;
 
 @Component
 public class receiveMq {
@@ -30,6 +30,7 @@ public class receiveMq {
     private SchedulixJobController sjc;
 	public Map<String, String> jobID = new HashMap<String, String>();
 	public Map<String, Long> wenjianTime = new HashMap<String, Long>();
+	private int MaxJOB=5;
 
 	// 使用JmsListener配置消费者监听的队列，其中text是接收到的消息
 	@JmsListener(destination = "wenjian_id")
@@ -45,7 +46,7 @@ public class receiveMq {
 		//Thread.sleep(60000);
 		//sjc.addNewJOB(wenjianId, "2222", "200");
 		while (true) {
-			if (jobID.size() == 2) {
+			if (jobID.size() == MaxJOB) {
 				logger.info("Warning:" + "Reach the current maximum number of jobs, waiting for 5s!!");
 				Thread.sleep(5000);
 				checkJobStatus();
