@@ -16,7 +16,7 @@ public class SchedulixCMD {
 		} else {
 			String str = jobname.substring(jobname.indexOf(".") + 1);
 			newStr = jobname.substring(0, jobname.indexOf(".") + 1) + str.substring(0, str.indexOf(".")) + "_"
-					+ documentType + str.substring(str.indexOf("."));
+					+ documentType + str.substring(str.indexOf("."))+"_"+documentType;
 		}
 
 		String command = "echo \"submit " + newStr + "  with parameter=(ID='" + documentId + "');\"|sdmsh";
