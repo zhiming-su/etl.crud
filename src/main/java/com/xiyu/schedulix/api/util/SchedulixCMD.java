@@ -9,13 +9,17 @@ import java.util.regex.Pattern;
 
 public class SchedulixCMD {
 	// 调用schedulix命令
-	public static String etlConvert(String jobname, String documentId) {
-		String command = "echo \"submit " + jobname + "  with parameter=(ID='" + documentId + "');\"|sdmsh";
-		// String command = "/home/ubuntu/schedulix/sdmsh_file/caiwu_wenben_1.sh " +
-		// documentId;
-		// String command = "/home/ubuntu/schedulix/sdmsh_file_01/caiwu_wenben_1.sh " +
-		// documentId;
-		// System.out.println("command:" + command);
+	public static String etlConvert(String jobname, String documentId, String documentType) {
+		String newStr = null;
+		if (documentType.equals("0")) {
+			newStr = jobname;
+		} else {
+			String str = jobname.substring(jobname.indexOf(".") + 1);
+			newStr = jobname.substring(0, jobname.indexOf(".") + 1) + str.substring(0, str.indexOf(".")) + "_"
+					+ documentType + str.substring(str.indexOf("."));
+		}
+
+		String command = "echo \"submit " + newStr + "  with parameter=(ID='" + documentId + "');\"|sdmsh";
 		String line = null;
 		StringBuilder sb = new StringBuilder();
 		Runtime runtime = Runtime.getRuntime();
