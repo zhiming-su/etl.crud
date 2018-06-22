@@ -42,7 +42,7 @@ public class Application {
 
     public ActiveMQQueue Queue() {
 
-       return new ActiveMQQueue("wenjian_id");
+       return new ActiveMQQueue("finanace-etl-convert");
 
     }
 //    @Bean

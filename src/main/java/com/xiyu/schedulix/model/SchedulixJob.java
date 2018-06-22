@@ -9,10 +9,17 @@ import javax.persistence.Table;
 public class SchedulixJob {
 	@Id
 	private String WENJIAN_ID;
+	private String DESTINATION;
     private String JOB_ID;
     private String STATUS;
 
-    public String getWENJIAN_ID() {
+    public String getDESTINATION() {
+		return DESTINATION;
+	}
+	public void setDESTINATION(String dESTINATION) {
+		DESTINATION = dESTINATION;
+	}
+	public String getWENJIAN_ID() {
 		return WENJIAN_ID;
 	}
 	public void setWENJIAN_ID(String wENJIAN_ID) {

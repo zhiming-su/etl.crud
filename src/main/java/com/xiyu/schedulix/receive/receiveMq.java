@@ -41,9 +41,10 @@ public class receiveMq {
 	public Map<String, String> jobID = Collections.synchronizedMap(new HashMap<String, String>());
 	public Map<String, Long> wenjianTime = new HashMap<String, Long>();
 	private int MaxJOB = 5;
+	private String destination = "finanace-etl-convert";
 
 	// 使用JmsListener配置消费者监听的队列，其中text是接收到的消息
-	@JmsListener(destination = "wenjian_id")
+	@JmsListener(destination = "finanace-etl-convert")
 	public void receiveQueue(Message message) throws InterruptedException, JMSException, JSONException {
 		// flag=true;
 		TextMessage textMsg = (TextMessage) message;
@@ -54,20 +55,19 @@ public class receiveMq {
 		String jobPath = null;
 		String wenjianType = null;
 		for (int i = 0; i <= info.length - 1; i++) {
-			if (Pattern.compile("^wenjianid[\\s\\S]*$").matcher(info[i]).find()) {
+			if (Pattern.compile("^wenjianId[\\s\\S]*$").matcher(info[i]).find()) {
 				wenjianId = info[i].split(":")[1];
-			} else if (Pattern.compile("^jobpath[\\s\\S]*$").matcher(info[i]).find()) {
-				jobPath = info[i].split(":")[1];
-			} else if (Pattern.compile("^wenjiantype[\\s\\S]*$").matcher(info[i]).find()) {
+			} else if (Pattern.compile("^wenjianLxBm[\\s\\S]*$").matcher(info[i]).find()) {
 				wenjianType = info[i].split(":")[1];
-			}
+			} 
 		}
 		logger.info("submit wenjian id :" + textMsg.getText());
 		// send("wenjian_id_status", new Job(wenjianId, "200"));
-		String schedulixJobID = SchedulixCMD.etlConvert(jobPath, wenjianId, wenjianType);
+		jobPath="SYSTEM."+"HUATAI_YX_"+wenjianType+".HUATAI_YX_BATCH_"+wenjianType;
+		String schedulixJobID = SchedulixCMD.etlConvert(jobPath, wenjianId );
 		jobID.put(wenjianId, schedulixJobID);
 		wenjianTime.put(schedulixJobID, Calendar.getInstance().getTimeInMillis());
-
+		sjc.addNewJOB(wenjianId, schedulixJobID, "300",destination);
 		while (true) {
 			if (jobID.size() == MaxJOB) {
 				// logger.info("Warning:" + "Reach the current maximum number of jobs, waiting
@@ -97,34 +97,34 @@ public class receiveMq {
 			String flag = SchedulixCMD.etlConvertResult(val);
 			if (flag.equals("success")) {
 				// send("wenjian_id_status", new Job(key, "200"));
-				sjc.addNewJOB(key, val, "200");
-				logger.info("INSERT DB:" + " wenjianId: " + key + " jobID: " + val + " statusID: " + "200");
+				sjc.addNewJOB(key, val, "200",destination);
+				logger.info("INSERT DB:"+"destination: "+destination + " wenjianId: " + key + " jobID: " + val + " statusID: " + "200");
 				jobInfo.remove();
 				//jobID.remove(key);
 			} else if (flag.equals("error")) {
 				// job.setMsg("失败");
 				// send("wenjian_id_status", new Job(key, "500"));
-				sjc.addNewJOB(key, val, "500");
-				logger.info("INSERT DB:" + " wenjianId: " + key + " jobID: " + val + " statusID: " + "500");
+				sjc.addNewJOB(key, val, "500",destination);
+				logger.info("INSERT DB:"+"destination: "+destination  + " wenjianId: " + key + " jobID: " + val + " statusID: " + "500");
 				jobInfo.remove();
 				//jobID.remove(key);
 			} else if (flag.equals("cancelled")) {
 				// job.setMsg("作业已经取消");
 				// send("wenjian_id_status", new Job(key, "301"));
-				sjc.addNewJOB(key, val, "301");
-				logger.info("INSERT DB:" + " wenjianId: " + key + " jobID: " + val + " statusID: " + "301");
+				sjc.addNewJOB(key, val, "301",destination);
+				logger.info("INSERT DB:" +"destination: "+destination + " wenjianId: " + key + " jobID: " + val + " statusID: " + "301");
 				jobInfo.remove();
 				//jobID.remove(key);
 			} else if (flag.equals("keyNotFound")) {
 				// job.setMsg("作业ID不存在");
 				// send("wenjian_id_status", new Job(key, "302"));
-				sjc.addNewJOB(key, val, "302");
-				logger.info("INSERT DB:" + " wenjianId: " + key + " jobID: " + val + " statusID: " + "302");
+				sjc.addNewJOB(key, val, "302",destination);
+				logger.info("INSERT DB:" +"destination: "+destination + " wenjianId: " + key + " jobID: " + val + " statusID: " + "302");
 				jobInfo.remove();
 				//jobID.remove(key);
 			} else {
 				// job.setMsg("正在执行");
-				sjc.addNewJOB(key, val, "300");
+				//sjc.addNewJOB(key, val, "300",destination);
 				// jmsTemplate.convertAndSend("wenjian_id_status", new Job(key, "300"));
 				// logger.info("INFO(not insert db):" + " wenjianId: " + key + " jobID: " + val
 				// + " statusID: " + "300");
