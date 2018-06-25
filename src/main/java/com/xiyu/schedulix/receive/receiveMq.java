@@ -74,7 +74,7 @@ public class receiveMq {
 				// for 5s!!");
 				Thread.sleep(3000);
 				// checkJobStatus();
-				killAndCancelJob();
+				//killAndCancelJob();
 				// mqSize = GetActiveMqSize.getMqSize();
 				// send("wenjian_id_status", new Job(wenjianId, "200"));
 			} else {
