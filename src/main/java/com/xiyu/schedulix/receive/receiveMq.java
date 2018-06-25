@@ -66,7 +66,7 @@ public class receiveMq {
 		jobPath="SYSTEM."+"HUATAI_YX_"+wenjianType+".HUATAI_YX_BATCH_"+wenjianType;
 		String schedulixJobID = SchedulixCMD.etlConvert(jobPath, wenjianId );
 		jobID.put(wenjianId, schedulixJobID);
-		wenjianTime.put(schedulixJobID, Calendar.getInstance().getTimeInMillis());
+		//wenjianTime.put(schedulixJobID, Calendar.getInstance().getTimeInMillis());
 		sjc.addNewJOB(wenjianId, schedulixJobID, "300",destination);
 		while (true) {
 			if (jobID.size() == MaxJOB) {
