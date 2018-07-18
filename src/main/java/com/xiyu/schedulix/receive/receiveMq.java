@@ -16,6 +16,7 @@ import org.json.JSONException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.jms.annotation.JmsListener;
 import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -40,7 +41,8 @@ public class receiveMq {
 	//public Map<String, String> jobID =new HashMap<String, String>();
 	public Map<String, String> jobID = Collections.synchronizedMap(new HashMap<String, String>());
 	public Map<String, Long> wenjianTime = new HashMap<String, Long>();
-	private int MaxJOB = 5;
+	@Value("${xiyu.etl.schedulix.maxjob}")
+	private int maxjob = 5;
 	private String destination = "finanace-etl-convert";
 
 	// 使用JmsListener配置消费者监听的队列，其中text是接收到的消息
@@ -69,7 +71,7 @@ public class receiveMq {
 		//wenjianTime.put(schedulixJobID, Calendar.getInstance().getTimeInMillis());
 		sjc.addNewJOB(wenjianId, schedulixJobID, "300",destination);
 		while (true) {
-			if (jobID.size() == MaxJOB) {
+			if (jobID.size() == maxjob) {
 				// logger.info("Warning:" + "Reach the current maximum number of jobs, waiting
 				// for 5s!!");
 				Thread.sleep(3000);
@@ -107,6 +109,8 @@ public class receiveMq {
 				sjc.addNewJOB(key, val, "500",destination);
 				logger.info("INSERT DB:"+"destination: "+destination  + " wenjianId: " + key + " jobID: " + val + " statusID: " + "500");
 				jobInfo.remove();
+				SchedulixCMD.cancelErrorJob(val);
+				logger.info(" jobID: " + val + "  Cancled Error JOB!!");
 				//jobID.remove(key);
 			} else if (flag.equals("cancelled")) {
 				// job.setMsg("作业已经取消");
