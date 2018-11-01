@@ -6,20 +6,16 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.regex.Pattern;
-
-import javax.jms.JMSException;
-import javax.jms.Message;
-import javax.jms.TextMessage;
-
+import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.json.JSONException;
+import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.jms.annotation.JmsListener;
+import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
@@ -31,43 +27,32 @@ import com.xiyu.schedulix.controller.SchedulixJobController;
 
 @Component
 @Configuration
-@ConditionalOnProperty(name = "xiyu.mq.type", havingValue = "activemq")
+@ConditionalOnProperty(name = "xiyu.mq.type", havingValue = "kafka")
 @EnableScheduling
-public class receiveMq {
+public class receiveKafka {
 
-	// private producerTest pt=new producerTest();
+
 	Logger logger = LoggerFactory.getLogger(getClass());
-	// @Autowired
-	// private JmsTemplate jmsTemplate;
-	// private JmsMessagingTemplate jmsMessagingTemplate;
+
 	@Autowired
 	private SchedulixJobController sjc;
-	//public Map<String, String> jobID =new HashMap<String, String>();
+
 	public Map<String, String> jobID = Collections.synchronizedMap(new HashMap<String, String>());
 	public Map<String, Long> wenjianTime = new HashMap<String, Long>();
 	@Value("${xiyu.etl.schedulix.maxjob}")
 	private int maxjob = 5;
 	private String destination = "finanace-etl-convert";
 
-	// 使用JmsListener配置消费者监听的队列，其中text是接收到的消息
-	@JmsListener(destination = "finanace-etl-convert")
-	public void receiveQueue(Message message) throws InterruptedException, JMSException, JSONException {
+	// 使用@KafkaListener配置消费者监听的队列，其中text是接收到的消息
+	 @KafkaListener(topics = {"finanace-etl-convert"})
+	public void receiveQueue(ConsumerRecord<?, ?> consumerRecord) throws InterruptedException, JSONException {
 		// flag=true;
-		TextMessage textMsg = (TextMessage) message;
-		// System.out.println(textMsg.getText());
-		String wenjianInfo = textMsg.getText().replaceAll("\"|\\}|\\{", "");
-		String info[] = wenjianInfo.split(",");
-		String wenjianId = null;
+		String textMsg = consumerRecord.value().toString();
+		JSONObject js = new JSONObject(textMsg);
+		String wenjianId = js.getString("wenjianId");
 		String jobPath = null;
-		String wenjianType = null;
-		for (int i = 0; i <= info.length - 1; i++) {
-			if (Pattern.compile("^wenjianId[\\s\\S]*$").matcher(info[i]).find()) {
-				wenjianId = info[i].split(":")[1];
-			} else if (Pattern.compile("^wenjianLxBm[\\s\\S]*$").matcher(info[i]).find()) {
-				wenjianType = info[i].split(":")[1];
-			} 
-		}
-		logger.info("submit wenjian id :" + textMsg.getText());
+		String wenjianType = js.getString("wenjianLxBm");
+		logger.info("submit wenjian id :" + textMsg);
 		// send("wenjian_id_status", new Job(wenjianId, "200"));
 		jobPath="SYSTEM."+"HUATAI_YX_"+wenjianType+".HUATAI_YX_BATCH_"+wenjianType;
 		String schedulixJobID = SchedulixCMD.etlConvert(jobPath, wenjianId );
@@ -76,13 +61,9 @@ public class receiveMq {
 		sjc.addNewJOB(wenjianId, schedulixJobID, "300",destination);
 		while (true) {
 			if (jobID.size() == maxjob) {
-				// logger.info("Warning:" + "Reach the current maximum number of jobs, waiting
-				// for 5s!!");
+
 				Thread.sleep(3000);
-				// checkJobStatus();
-				//killAndCancelJob();
-				// mqSize = GetActiveMqSize.getMqSize();
-				// send("wenjian_id_status", new Job(wenjianId, "200"));
+	
 			} else {
 				break;
 			}
