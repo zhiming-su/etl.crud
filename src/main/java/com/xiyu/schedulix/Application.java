@@ -3,7 +3,6 @@ package com.xiyu.schedulix;
 import javax.jms.ConnectionFactory;
 
 
-import org.apache.activemq.command.ActiveMQQueue;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.autoconfigure.jms.DefaultJmsListenerContainerFactoryConfigurer;
@@ -29,7 +28,7 @@ public class Application {
         // You could still override some of Boot's default if necessary.
         return factory;
     }
-
+    
     @Bean // Serialize message content to json using TextMessage
     public MessageConverter jacksonJmsMessageConverter() {
         MappingJackson2MessageConverter converter = new MappingJackson2MessageConverter();
@@ -37,7 +36,7 @@ public class Application {
         converter.setTypeIdPropertyName("_type");
         return converter;
     }
-    
+    /*    
     @Bean
 
     public ActiveMQQueue Queue() {
@@ -45,6 +44,20 @@ public class Application {
        return new ActiveMQQueue("finanace-etl-convert");
 
     }
+    @Bean
+
+    public ActiveMQQueue QueueOcr() {
+
+       return new ActiveMQQueue("finanace-ocr-etl");
+
+    }
+    @Bean
+
+    public ActiveMQQueue QueueThird() {
+
+       return new ActiveMQQueue("finanace-third-etl");
+
+    }*/
 //    @Bean
 //
 //    public ActiveMQQueue Queue01() {

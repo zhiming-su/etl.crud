@@ -6,13 +6,12 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.regex.Pattern;
-
 import javax.jms.JMSException;
 import javax.jms.Message;
 import javax.jms.TextMessage;
 
 import org.json.JSONException;
+import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -52,22 +51,13 @@ public class receiveMq {
 	// 使用JmsListener配置消费者监听的队列，其中text是接收到的消息
 	@JmsListener(destination = "finanace-etl-convert")
 	public void receiveQueue(Message message) throws InterruptedException, JMSException, JSONException {
-		// flag=true;
-		TextMessage textMsg = (TextMessage) message;
-		// System.out.println(textMsg.getText());
-		String wenjianInfo = textMsg.getText().replaceAll("\"|\\}|\\{", "");
-		String info[] = wenjianInfo.split(",");
-		String wenjianId = null;
+		TextMessage getTextMsg = (TextMessage) message;
+		String textMsg = getTextMsg.getText();
+		JSONObject js = new JSONObject(textMsg);
+		String wenjianId = js.getString("wenjianId");
 		String jobPath = null;
-		String wenjianType = null;
-		for (int i = 0; i <= info.length - 1; i++) {
-			if (Pattern.compile("^wenjianId[\\s\\S]*$").matcher(info[i]).find()) {
-				wenjianId = info[i].split(":")[1];
-			} else if (Pattern.compile("^wenjianLxBm[\\s\\S]*$").matcher(info[i]).find()) {
-				wenjianType = info[i].split(":")[1];
-			} 
-		}
-		logger.info("finanace submit wenjian id :" + textMsg.getText());
+		String wenjianType = js.getString("wenjianLxBm");
+		logger.info("finanace submit wenjian id :" + textMsg);
 		// send("wenjian_id_status", new Job(wenjianId, "200"));
 		jobPath="SYSTEM."+"HUATAI_YX_"+wenjianType+".HUATAI_YX_BATCH_"+wenjianType;
 		String schedulixJobID = SchedulixCMD.etlConvert(jobPath, wenjianId );

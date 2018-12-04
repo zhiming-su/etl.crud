@@ -6,7 +6,11 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Map.Entry;
-import org.apache.kafka.clients.consumer.ConsumerRecord;
+
+import javax.jms.JMSException;
+import javax.jms.Message;
+import javax.jms.TextMessage;
+
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.slf4j.Logger;
@@ -45,9 +49,10 @@ public class receiveThirdMq {
 
 	// 使用@KafkaListener配置消费者监听的队列，其中text是接收到的消息
 	@JmsListener(destination = "finanace-third-etl")
-	public void receiveQueue(ConsumerRecord<?, ?> consumerRecord) throws InterruptedException, JSONException {
+	public void receiveQueue(Message message) throws InterruptedException, JMSException, JSONException {
 		// flag=true;
-		String textMsg = consumerRecord.value().toString();
+		TextMessage getTextMsg = (TextMessage) message;
+		String textMsg = getTextMsg.getText();
 		JSONObject js = new JSONObject(textMsg);
 		String wenjianId = js.getString("wenjianId");
 		String jobPath = null;

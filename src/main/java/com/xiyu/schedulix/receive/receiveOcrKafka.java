@@ -15,7 +15,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.jms.annotation.JmsListener;
+import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
@@ -44,7 +44,7 @@ public class receiveOcrKafka {
 	private String destination = "finanace-ocr-etl";
 
 	// 使用@KafkaListener配置消费者监听的队列，其中text是接收到的消息
-	@JmsListener(destination = "finanace-ocr-etl")
+	@KafkaListener(topics = {"finanace-ocr-etl"})
 	public void receiveQueue(ConsumerRecord<?, ?> consumerRecord) throws InterruptedException, JSONException {
 		// flag=true;
 		String textMsg = consumerRecord.value().toString();
