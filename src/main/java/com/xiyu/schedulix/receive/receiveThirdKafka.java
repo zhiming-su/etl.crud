@@ -52,7 +52,7 @@ public class receiveThirdKafka {
 		String wenjianId = js.getString("wenjianId");
 		String jobPath = null;
 		//String wenjianType = js.getString("wenjianLxBm");
-		logger.info("submit wenjian id :" + textMsg);
+		logger.info("third submit wenjian id :" + textMsg);
 		// send("wenjian_id_status", new Job(wenjianId, "200"));
 		jobPath="SYSTEM.HUATAI_WB_JOB.WB_SHUJU_BATCH";
 		String schedulixJobID = SchedulixCMD.etlConvert(jobPath, wenjianId );
@@ -85,30 +85,30 @@ public class receiveThirdKafka {
 			if (flag.equals("success")) {
 				// send("wenjian_id_status", new Job(key, "200"));
 				sjc.addNewJOB(key, val, "200",destination);
-				logger.info("INSERT DB:"+"destination: "+destination + " wenjianId: " + key + " jobID: " + val + " statusID: " + "200");
+				logger.info("third INSERT DB:"+"destination: "+destination + " wenjianId: " + key + " jobID: " + val + " statusID: " + "200");
 				jobInfo.remove();
 				//jobID.remove(key);
 			} else if (flag.equals("error")) {
 				// job.setMsg("失败");
 				// send("wenjian_id_status", new Job(key, "500"));
 				sjc.addNewJOB(key, val, "500",destination);
-				logger.info("INSERT DB:"+"destination: "+destination  + " wenjianId: " + key + " jobID: " + val + " statusID: " + "500");
+				logger.info("third INSERT DB:"+"destination: "+destination  + " wenjianId: " + key + " jobID: " + val + " statusID: " + "500");
 				jobInfo.remove();
 				SchedulixCMD.cancelErrorJob(val);
-				logger.info(" jobID: " + val + "  Cancled Error JOB!!");
+				logger.info("third  jobID: " + val + "  Cancled Error JOB!!");
 				//jobID.remove(key);
 			} else if (flag.equals("cancelled")) {
 				// job.setMsg("作业已经取消");
 				// send("wenjian_id_status", new Job(key, "301"));
 				sjc.addNewJOB(key, val, "301",destination);
-				logger.info("INSERT DB:" +"destination: "+destination + " wenjianId: " + key + " jobID: " + val + " statusID: " + "301");
+				logger.info("third INSERT DB:" +"destination: "+destination + " wenjianId: " + key + " jobID: " + val + " statusID: " + "301");
 				jobInfo.remove();
 				//jobID.remove(key);
 			} else if (flag.equals("keyNotFound")) {
 				// job.setMsg("作业ID不存在");
 				// send("wenjian_id_status", new Job(key, "302"));
 				sjc.addNewJOB(key, val, "302",destination);
-				logger.info("INSERT DB:" +"destination: "+destination + " wenjianId: " + key + " jobID: " + val + " statusID: " + "302");
+				logger.info("third INSERT DB:" +"destination: "+destination + " wenjianId: " + key + " jobID: " + val + " statusID: " + "302");
 				jobInfo.remove();
 				//jobID.remove(key);
 			} else {

@@ -67,7 +67,7 @@ public class receiveMq {
 				wenjianType = info[i].split(":")[1];
 			} 
 		}
-		logger.info("submit wenjian id :" + textMsg.getText());
+		logger.info("finanace submit wenjian id :" + textMsg.getText());
 		// send("wenjian_id_status", new Job(wenjianId, "200"));
 		jobPath="SYSTEM."+"HUATAI_YX_"+wenjianType+".HUATAI_YX_BATCH_"+wenjianType;
 		String schedulixJobID = SchedulixCMD.etlConvert(jobPath, wenjianId );
@@ -104,7 +104,7 @@ public class receiveMq {
 			if (flag.equals("success")) {
 				// send("wenjian_id_status", new Job(key, "200"));
 				sjc.addNewJOB(key, val, "200",destination);
-				logger.info("INSERT DB:"+"destination: "+destination + " wenjianId: " + key + " jobID: " + val + " statusID: " + "200");
+				logger.info("finanace INSERT DB:"+"destination: "+destination + " wenjianId: " + key + " jobID: " + val + " statusID: " + "200");
 				jobInfo.remove();
 				//jobID.remove(key);
 			} else if (flag.equals("error")) {
@@ -114,20 +114,20 @@ public class receiveMq {
 				logger.info("INSERT DB:"+"destination: "+destination  + " wenjianId: " + key + " jobID: " + val + " statusID: " + "500");
 				jobInfo.remove();
 				SchedulixCMD.cancelErrorJob(val);
-				logger.info(" jobID: " + val + "  Cancled Error JOB!!");
+				logger.info("finanace  jobID: " + val + "  Cancled Error JOB!!");
 				//jobID.remove(key);
 			} else if (flag.equals("cancelled")) {
 				// job.setMsg("作业已经取消");
 				// send("wenjian_id_status", new Job(key, "301"));
 				sjc.addNewJOB(key, val, "301",destination);
-				logger.info("INSERT DB:" +"destination: "+destination + " wenjianId: " + key + " jobID: " + val + " statusID: " + "301");
+				logger.info("finanace INSERT DB:" +"destination: "+destination + " wenjianId: " + key + " jobID: " + val + " statusID: " + "301");
 				jobInfo.remove();
 				//jobID.remove(key);
 			} else if (flag.equals("keyNotFound")) {
 				// job.setMsg("作业ID不存在");
 				// send("wenjian_id_status", new Job(key, "302"));
 				sjc.addNewJOB(key, val, "302",destination);
-				logger.info("INSERT DB:" +"destination: "+destination + " wenjianId: " + key + " jobID: " + val + " statusID: " + "302");
+				logger.info("finanace INSERT DB:" +"destination: "+destination + " wenjianId: " + key + " jobID: " + val + " statusID: " + "302");
 				jobInfo.remove();
 				//jobID.remove(key);
 			} else {
