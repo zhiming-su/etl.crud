@@ -1,16 +1,31 @@
 package com.xiyu.schedulix.model;
 
+import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
+import javax.persistence.IdClass;
 import javax.persistence.Table;
 
 @Entity
 @Table(name="ETL_JOB")
+@IdClass(PrimaryKeySchedulixJob.class)
 public class SchedulixJob {
+	
 	@Id
+	@Column(name = "WENJIAN_ID")
 	private String WENJIAN_ID;
+	
+	@Id
+	@Column(name = "WENJIAN_LX")
+	private String WENJIAN_LX;
+	
+	@Column(name = "DESTINATION")
 	private String DESTINATION;
+	
+	@Column(name = "JOB_ID")
     private String JOB_ID;
+	
+	@Column(name = "STATUS")
     private String STATUS;
 
     public String getDESTINATION() {
@@ -36,6 +51,13 @@ public class SchedulixJob {
 	}
 	public void setSTATUS(String sTATUS) {
 		STATUS = sTATUS;
+	}
+
+	public String getWENJIAN_LX() {
+		return WENJIAN_LX;
+	}
+	public void setWENJIAN_LX(String wENJIAN_LX) {
+		WENJIAN_LX = wENJIAN_LX;
 	}
 
     
