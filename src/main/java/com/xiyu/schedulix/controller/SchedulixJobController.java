@@ -1,7 +1,10 @@
 package com.xiyu.schedulix.controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.SpringApplication;
 import org.springframework.stereotype.Controller;
+
+import com.xiyu.schedulix.Application;
 import com.xiyu.schedulix.model.SchedulixJob;
 import com.xiyu.schedulix.repository.SchedulixJobRepository;
 
@@ -24,4 +27,5 @@ public class SchedulixJobController {
 		sjr.save(sj);
 	//	return "Saved";
 	}
+
 }
