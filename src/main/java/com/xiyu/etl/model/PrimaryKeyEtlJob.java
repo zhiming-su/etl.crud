@@ -1,9 +1,9 @@
-package com.xiyu.schedulix.model;
+package com.xiyu.etl.model;
 
 import java.io.Serializable;
 
 
-public class PrimaryKeySchedulixJob implements Serializable{
+public class PrimaryKeyEtlJob implements Serializable{
 	
 	/**
 	 * 
